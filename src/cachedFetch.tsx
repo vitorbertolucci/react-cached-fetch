@@ -81,7 +81,7 @@ export const useCachedFetch = (route: string, options?: Options) => {
   }, [route, dispatch, updateCache, fetchCallback, shouldRefresh, headers]);
 
   const refresh = () => {
-    setShouldRefresh(current => !current);
+    setShouldRefresh((current: Boolean) => !current);
   };
 
   return { data: cache[route], ...state, refresh };
