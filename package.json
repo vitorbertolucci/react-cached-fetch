@@ -3,9 +3,17 @@
   "version": "1.0.0",
   "description": "React hook for fetching data with cache functionality",
   "main": "index.js",
-  "author": "vitorbertolucci",
+  "author": "Vitor Bertolucci",
   "license": "MIT",
   "private": false,
+  "homepage": "https://github.com/vitorbertolucci/react-cached-fetch#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vitorbertolucci/react-cached-fetch.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vitorbertolucci/react-cached-fetch/issues"
+  },
   "dependencies": {
     "@types/jest": "^26.0.14",
     "@types/node": "^14.11.2",
