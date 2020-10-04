@@ -16,7 +16,7 @@ npm install react-cached-fetch
 
 ## Usage
 
-Since the hook uses Context API for storing the cached data, you must first wrap your app component (or only the part of your app where you want the cache to be available) with **CachedFetchProvider**.
+Since the hook uses Context API to store the cached data, you must first wrap your app component (or only the part of your app where you want the cache to be available) with **CachedFetchProvider**.
 
 ```javascript
 import React from "react";
