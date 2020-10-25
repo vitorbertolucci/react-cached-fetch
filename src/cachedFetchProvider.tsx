@@ -5,9 +5,13 @@ import React, {
   FunctionComponent
 } from "react";
 
-export interface Options {
-  headers: Headers;
-  fetcher(): any;
+export interface ICachedFetchOptions {
+  headers?: Headers;
+  fetcher?: (route: string, headers: Headers) => any;
+}
+
+interface ICachedFetchProviderProps {
+  globalOptions?: ICachedFetchOptions;
 }
 
 export const CachedFetchContext = createContext({});
@@ -23,11 +27,7 @@ const defaultOptions = {
   }
 };
 
-type CachedFetchProvider = {
-  globalOptions: Options;
-};
-
-export const CachedFetchProvider: FunctionComponent<CachedFetchProvider> = ({
+export const CachedFetchProvider: FunctionComponent<ICachedFetchProviderProps> = ({
   globalOptions = defaultOptions,
   children
 }) => {

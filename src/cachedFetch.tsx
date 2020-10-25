@@ -5,18 +5,21 @@ import {
   useReducer,
   useState
 } from "react";
-import { CachedFetchContext, Options } from "./cachedFetchProvider";
+import { CachedFetchContext, ICachedFetchOptions } from "./cachedFetchProvider";
 
-interface State {
+interface ICachedFetchReducerState {
   isLoading: boolean;
   hasError: boolean;
 }
 
-interface Action {
+interface ICachedFetchReducerAction {
   type: string;
 }
 
-const cachedFetchReducer = (state: State, action: Action): State => {
+const cachedFetchReducer = (
+  state: ICachedFetchReducerState,
+  action: ICachedFetchReducerAction
+): ICachedFetchReducerState => {
   switch (action.type) {
     case "FETCH_INIT":
       return {
@@ -38,7 +41,10 @@ const cachedFetchReducer = (state: State, action: Action): State => {
   }
 };
 
-export const useCachedFetch = (route: string, options?: Options) => {
+export const useCachedFetch = (
+  route: string,
+  options?: ICachedFetchOptions
+) => {
   const { cache, updateCache, globalOptions }: any = useContext(
     CachedFetchContext
   );
