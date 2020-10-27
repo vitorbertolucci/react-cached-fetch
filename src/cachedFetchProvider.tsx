@@ -8,6 +8,7 @@ import React, {
 export interface ICachedFetchOptions {
   headers?: Headers;
   fetcher?: (route: string, headers: Headers) => any;
+  initialValue?: any;
 }
 
 interface ICachedFetchProviderProps {
@@ -24,7 +25,8 @@ const defaultOptions = {
   },
   headers: {
     method: "GET"
-  }
+  },
+  initialValue: undefined
 };
 
 export const CachedFetchProvider: FunctionComponent<ICachedFetchProviderProps> = ({

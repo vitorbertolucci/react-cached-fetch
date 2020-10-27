@@ -90,5 +90,9 @@ export const useCachedFetch = (
     setShouldRefresh((current: Boolean) => !current);
   };
 
-  return { data: cache[route], ...state, refresh };
+  return {
+    data: cache[route] ?? unifiedOptions.initialValue,
+    ...state,
+    refresh
+  };
 };
