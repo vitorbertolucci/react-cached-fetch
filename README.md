@@ -2,6 +2,12 @@
 
 A simple react hook for data fetching with cache. It serves the cached version while waiting for the data to be fetched and then updates the cache with the fetched result.
 
+Features:
+✅ Unopinionated
+✅ 0 dependencies
+✅ TypeScript ready
+✅ Allows programmatic refresh
+
 ## Installation
 
 ```
@@ -102,6 +108,8 @@ async (route, header) => {
   return result;
 };
 ```
+
+- **initialValue**: the initial value for the **data** property. Defaults to undefined.
 
 ### Usage with other HTTP clients
 
