@@ -2,7 +2,7 @@
 
 A simple react hook for data fetching with cache. It serves the cached version while waiting for the data to be fetched and then updates the cache with the fetched result.
 
-Features:
+Features:  
 ✅ Unopinionated  
 ✅ 0 dependencies  
 ✅ TypeScript ready  
