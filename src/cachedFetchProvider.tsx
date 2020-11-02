@@ -9,6 +9,14 @@ export interface ICachedFetchOptions {
   headers?: Headers;
   fetcher?: (route: string, headers: Headers) => any;
   initialValue?: any;
+  dependencies?: boolean[];
+}
+
+export interface ICachedFetchDefaultOptions {
+  headers: Headers;
+  fetcher: (route: string, headers: Headers) => any;
+  initialValue: any;
+  dependencies: boolean[];
 }
 
 interface ICachedFetchProviderProps {
@@ -26,7 +34,8 @@ const defaultOptions = {
   headers: {
     method: "GET"
   },
-  initialValue: undefined
+  initialValue: undefined,
+  dependencies: []
 };
 
 export const CachedFetchProvider: FunctionComponent<ICachedFetchProviderProps> = ({
