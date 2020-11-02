@@ -6,6 +6,7 @@ Features:
 ✅ Unopinionated  
 ✅ 0 dependencies  
 ✅ TypeScript ready  
+✅ Chained calls  
 ✅ Allows programmatic refresh
 
 ## Installation
@@ -111,6 +112,27 @@ async (route, header) => {
 
 - **initialValue**: the initial value for the **data** property. Defaults to undefined.
 
+- **dependencies**: an array with dependencies on which the fetcher function depends on to be triggered. The array must only contain boolean values. The hook will wait until all values on the array are true before calling the fetcher function. It is useful in cases where you have to make sure of something before fetching the data, like veryfing an authentication token or chaining calls. Here is an example:
+
+```javascript
+const UserInformationDashboard = () => {
+  const { data: user } = useCachedFetch("users", {
+    initialValue: null
+  });
+  const { data: userDetails } = useCachedFetch(`userDetails/${user.id}`, {
+    initialValue: {
+      name: "",
+      posts: 0
+    },
+    dependencies: [user !== null]
+  });
+
+  return <>Your Code</>;
+};
+```
+
+In the example above the request to **userDetails:/id** will only be made once the request to **users** has been fulfilled.
+
 ### Usage with other HTTP clients
 
 By default, the hook uses the standard fetch API to request the data, but you can use any other client you want by passing your custom fetcher function:
@@ -139,7 +161,7 @@ export default UserList;
 
 ### Providing global options
 
-It is also possible to provide global options so that every call to **useCachedFetch** will use them. You can do so by passing the **globalOptions** prop to **CachedFetchProvider**:
+It is also possible to globally provide all available options so that every call to **useCachedFetch** will use them. You can do so by passing the **globalOptions** prop to **CachedFetchProvider**:
 
 ```javascript
 import React from "react";
@@ -177,7 +199,7 @@ useCachedFetch("http://my-api/lists", {
 });
 ```
 
-The new fetcher will be used and the headers option defined as globalOption will be kept.
+The new fetcher function will be used and the headers option defined as globalOption will be kept.
 
 ## 🤝 Contributing
 
