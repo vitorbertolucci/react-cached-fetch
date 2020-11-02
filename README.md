@@ -131,7 +131,7 @@ const UserInformationDashboard = () => {
 };
 ```
 
-In the example above the request to **userDetails:/id** will only be made once the request to **users** has been fulfilled.
+In the example above the request to **userDetails/:id** will only be made once the request to **users** has been fulfilled.
 
 ### Usage with other HTTP clients
 
