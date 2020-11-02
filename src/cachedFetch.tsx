@@ -48,17 +48,36 @@ export const useCachedFetch = (
   const { cache, updateCache, globalOptions }: any = useContext(
     CachedFetchContext
   );
-  const unifiedOptions = { ...globalOptions, ...options };
+  const unifiedOptions: ICachedFetchOptions = { ...globalOptions, ...options };
   const [headers] = useState(unifiedOptions.headers);
   const [state, dispatch] = useReducer(cachedFetchReducer, {
     isLoading: false,
     hasError: false
   });
   const [shouldRefresh, setShouldRefresh] = useState(false);
+  const [isWaitingForDependencies, setIsWaitingForDependencies] = useState(
+    true
+  );
 
   const fetchCallback = useCallback(unifiedOptions.fetcher, []);
 
   useEffect(() => {
+    if (
+      unifiedOptions.dependencies &&
+      unifiedOptions.dependencies.some((dependency: boolean) => !dependency)
+    ) {
+      setIsWaitingForDependencies(true);
+      return;
+    }
+
+    setIsWaitingForDependencies(false);
+  }, [unifiedOptions.dependencies]);
+
+  useEffect(() => {
+    if (isWaitingForDependencies) {
+      return;
+    }
+
     let mounted = true;
 
     const fetchData = async () => {
@@ -84,7 +103,15 @@ export const useCachedFetch = (
     return () => {
       mounted = false;
     };
-  }, [route, dispatch, updateCache, fetchCallback, shouldRefresh, headers]);
+  }, [
+    route,
+    dispatch,
+    updateCache,
+    fetchCallback,
+    shouldRefresh,
+    headers,
+    isWaitingForDependencies
+  ]);
 
   const refresh = () => {
     setShouldRefresh((current: Boolean) => !current);
