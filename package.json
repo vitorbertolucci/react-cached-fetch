@@ -1,6 +1,6 @@
 {
   "name": "react-cached-fetch",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "React hook for fetching data with cache functionality",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
