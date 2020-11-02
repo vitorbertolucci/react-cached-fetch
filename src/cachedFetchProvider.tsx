@@ -12,6 +12,13 @@ export interface ICachedFetchOptions {
   dependencies?: boolean[];
 }
 
+export interface ICachedFetchDefaultOptions {
+  headers: Headers;
+  fetcher: (route: string, headers: Headers) => any;
+  initialValue: any;
+  dependencies: boolean[];
+}
+
 interface ICachedFetchProviderProps {
   globalOptions?: ICachedFetchOptions;
 }

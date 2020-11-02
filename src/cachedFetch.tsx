@@ -5,7 +5,11 @@ import {
   useReducer,
   useState
 } from "react";
-import { CachedFetchContext, ICachedFetchOptions } from "./cachedFetchProvider";
+import {
+  CachedFetchContext,
+  ICachedFetchDefaultOptions,
+  ICachedFetchOptions
+} from "./cachedFetchProvider";
 
 interface ICachedFetchReducerState {
   isLoading: boolean;
@@ -48,8 +52,11 @@ export const useCachedFetch = (
   const { cache, updateCache, globalOptions }: any = useContext(
     CachedFetchContext
   );
-  const unifiedOptions: ICachedFetchOptions = { ...globalOptions, ...options };
-  const [headers] = useState(unifiedOptions.headers);
+  const unifiedOptions: ICachedFetchDefaultOptions = {
+    ...globalOptions,
+    ...options
+  };
+  const [headers] = useState<Headers>(unifiedOptions.headers);
   const [state, dispatch] = useReducer(cachedFetchReducer, {
     isLoading: false,
     hasError: false
