@@ -1,34 +1,28 @@
-import React, {
-  useCallback,
-  useState,
-  createContext,
-  FunctionComponent,
-  useMemo,
-} from 'react';
+import React, { useCallback, useState, useMemo, createContext } from 'react';
 
-export interface ICachedFetchOptions {
+interface ICachedFetchGlobalOptions {
   headers: Headers;
-  fetcher: (route: string, headers: Headers) => any;
+  fetcher: (route: string, headers: Headers) => Promise<any>;
   initialValue: any;
   dependencies: boolean[];
 }
 
-export interface ICachedFetchProviderOptionalOptions {
+interface ICachedFetchProviderGlobalOptions {
   headers?: Headers;
-  fetcher?: (route: string, headers: Headers) => any;
+  fetcher?: (route: string, headers: Headers) => Promise<any>;
   initialValue?: any;
   dependencies?: boolean[];
 }
 
 interface ICachedFetchProviderProps {
-  globalOptions?: ICachedFetchProviderOptionalOptions;
+  globalOptions?: ICachedFetchProviderGlobalOptions;
 }
 
 interface ICache {
   [key: string]: any;
 }
 interface ICachedFetchContextData {
-  globalOptions: ICachedFetchOptions;
+  globalOptions: ICachedFetchGlobalOptions;
   cache: ICache;
   updateCache(key: string, data: any): void;
 }
@@ -37,7 +31,7 @@ export const CachedFetchContext = createContext<ICachedFetchContextData>(
   {} as ICachedFetchContextData,
 );
 
-const defaultOptions: ICachedFetchOptions = {
+const defaultOptions: ICachedFetchGlobalOptions = {
   fetcher: async (route: string, headers: Headers): Promise<any> => {
     const response = await fetch(route, { headers });
     const result = await response.json();
@@ -55,7 +49,7 @@ const defaultOptions: ICachedFetchOptions = {
   dependencies: [],
 };
 
-export const CachedFetchProvider: FunctionComponent<ICachedFetchProviderProps> = ({
+export const CachedFetchProvider: React.FC<ICachedFetchProviderProps> = ({
   globalOptions,
   children,
 }) => {
@@ -65,7 +59,7 @@ export const CachedFetchProvider: FunctionComponent<ICachedFetchProviderProps> =
     setCache((current: ICache) => ({ ...current, [key]: data }));
   }, []);
 
-  const memoizedGlobalOptions = useMemo<ICachedFetchOptions>(() => {
+  const memoizedGlobalOptions = useMemo<ICachedFetchGlobalOptions>(() => {
     if (!globalOptions) {
       return defaultOptions;
     }

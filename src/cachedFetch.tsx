@@ -6,11 +6,7 @@ import {
   useState,
   useMemo,
 } from 'react';
-import {
-  CachedFetchContext,
-  ICachedFetchOptions,
-  ICachedFetchProviderOptionalOptions,
-} from './cachedFetchProvider';
+import { CachedFetchContext } from './cachedFetchProvider';
 
 interface ICachedFetchReducerState {
   isLoading: boolean;
@@ -21,11 +17,25 @@ interface ICachedFetchReducerAction {
   type: string;
 }
 
-interface IUseCachedFetchReturn {
-  data: any;
+interface IUseCachedFetchReturn<T> {
+  data: T;
   isLoading: boolean;
   hasError: boolean;
   refresh(): void;
+}
+
+interface IUseCachedFetchOptionalOptions<T> {
+  headers?: Headers;
+  fetcher?: (route: string, headers: Headers) => Promise<T>;
+  initialValue?: T;
+  dependencies?: boolean[];
+}
+
+interface IUseCachedFetchOptions<T> {
+  headers: Headers;
+  fetcher: (route: string, headers: Headers) => Promise<T>;
+  initialValue: T;
+  dependencies: boolean[];
 }
 
 const cachedFetchReducer = (
@@ -53,13 +63,13 @@ const cachedFetchReducer = (
   }
 };
 
-export const useCachedFetch = (
+export function useCachedFetch<T = any>(
   route: string,
-  options?: ICachedFetchProviderOptionalOptions,
-): IUseCachedFetchReturn => {
+  options?: IUseCachedFetchOptionalOptions<T>,
+): IUseCachedFetchReturn<T> {
   const { cache, updateCache, globalOptions } = useContext(CachedFetchContext);
 
-  const memoizedOptions = useMemo<ICachedFetchProviderOptionalOptions>(() => {
+  const memoizedOptions = useMemo<IUseCachedFetchOptionalOptions<T>>(() => {
     if (!options) {
       return {};
     }
@@ -67,7 +77,7 @@ export const useCachedFetch = (
     return options;
   }, [options]);
 
-  const unifiedOptions = useMemo<ICachedFetchOptions>(() => {
+  const unifiedOptions = useMemo<IUseCachedFetchOptions<T>>(() => {
     return { ...globalOptions, ...memoizedOptions };
   }, [globalOptions, memoizedOptions]);
 
@@ -145,4 +155,4 @@ export const useCachedFetch = (
     ...state,
     refresh,
   };
-};
+}
