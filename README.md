@@ -23,6 +23,8 @@ You can silently send a new GET request to your API and have your UI updated aut
 This library if fully written in TypeScript and supports generic types. You can use it both with plain JavaScript or with TypeScript
 <br/><br/>
 
+<!-- omit in toc -->
+# Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
 - [API](#api)
