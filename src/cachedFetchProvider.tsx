@@ -2,8 +2,8 @@ import React, {
   useCallback,
   useState,
   createContext,
-  FunctionComponent
-} from "react";
+  FunctionComponent,
+} from 'react';
 
 export interface ICachedFetchOptions {
   headers?: Headers;
@@ -32,15 +32,15 @@ const defaultOptions = {
     return result;
   },
   headers: {
-    method: "GET"
+    method: 'GET',
   },
   initialValue: undefined,
-  dependencies: []
+  dependencies: [],
 };
 
 export const CachedFetchProvider: FunctionComponent<ICachedFetchProviderProps> = ({
   globalOptions = defaultOptions,
-  children
+  children,
 }) => {
   const [cache, setCache] = useState<any>({});
 
@@ -53,7 +53,7 @@ export const CachedFetchProvider: FunctionComponent<ICachedFetchProviderProps> =
       value={{
         cache,
         updateCache,
-        globalOptions: { ...defaultOptions, ...globalOptions }
+        globalOptions: { ...defaultOptions, ...globalOptions },
       }}
     >
       {children}

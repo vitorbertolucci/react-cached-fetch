@@ -1,2 +1,2 @@
-export { useCachedFetch } from "./cachedFetch";
-export { CachedFetchProvider, CachedFetchContext } from "./cachedFetchProvider";
+export { useCachedFetch } from './cachedFetch';
+export { CachedFetchProvider, CachedFetchContext } from './cachedFetchProvider';
