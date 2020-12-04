@@ -4,11 +4,12 @@ import {
   useContext,
   useReducer,
   useState,
+  useMemo,
 } from 'react';
 import {
   CachedFetchContext,
-  ICachedFetchDefaultOptions,
   ICachedFetchOptions,
+  ICachedFetchProviderOptionalOptions,
 } from './cachedFetchProvider';
 
 interface ICachedFetchReducerState {
@@ -54,26 +55,30 @@ const cachedFetchReducer = (
 
 export const useCachedFetch = (
   route: string,
-  options?: ICachedFetchOptions,
+  options?: ICachedFetchProviderOptionalOptions,
 ): IUseCachedFetchReturn => {
-  const { cache, updateCache, globalOptions }: any = useContext(
-    CachedFetchContext,
-  );
-  const unifiedOptions: ICachedFetchDefaultOptions = {
-    ...globalOptions,
-    ...options,
-  };
+  const { cache, updateCache, globalOptions } = useContext(CachedFetchContext);
+
+  const unifiedOptions = useMemo<ICachedFetchOptions>(() => {
+    return { ...globalOptions, ...options };
+  }, [globalOptions, options]);
+
   const [headers] = useState<Headers>(unifiedOptions.headers);
-  const [state, dispatch] = useReducer(cachedFetchReducer, {
-    isLoading: false,
-    hasError: false,
-  });
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [isWaitingForDependencies, setIsWaitingForDependencies] = useState(
     true,
   );
 
-  const fetchCallback = useCallback(unifiedOptions.fetcher, []);
+  const [state, dispatch] = useReducer(cachedFetchReducer, {
+    isLoading: false,
+    hasError: false,
+  });
+
+  const fetchCallback = useCallback(
+    (_route: string, _headers: Headers) =>
+      unifiedOptions.fetcher(_route, _headers),
+    [unifiedOptions],
+  );
 
   useEffect(() => {
     if (
@@ -127,9 +132,9 @@ export const useCachedFetch = (
     isWaitingForDependencies,
   ]);
 
-  const refresh = () => {
+  const refresh = useCallback(() => {
     setShouldRefresh((current: Boolean) => !current);
-  };
+  }, []);
 
   return {
     data: cache[route] ?? unifiedOptions.initialValue,
