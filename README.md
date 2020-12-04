@@ -1,8 +1,10 @@
+<!-- omit in toc -->
 # react-cached-fetch
 
 A simple react hook for data fetching with cache. It serves the cached version while waiting for the data to be fetched and then updates the cache with the fetched result. It is great for grids, lists or any other page thats loads data.
 <br/><br/>
 
+<!-- omit in toc -->
 # Features:<br/>
 ✅ 0 dependencies<br/><br/>
 ✅ Unopinionated<br/>
@@ -20,6 +22,18 @@ You can silently send a new GET request to your API and have your UI updated aut
 ✅ TypeScript ready<br/>
 This library if fully written in TypeScript and supports generic types. You can use it both with plain JavaScript or with TypeScript
 <br/><br/>
+
+- [Installation](#installation)
+- [Usage](#usage)
+- [API](#api)
+  - [useCachedFetch](#usecachedfetch)
+  - [Options](#options)
+  - [Global Options](#global-options)
+- [Usage with other HTTP clients](#usage-with-other-http-clients)
+- [Usage with Typescript](#usage-with-typescript)
+- [🤝 Contributing](#-contributing)
+- [License](#license)
+
 # Installation
 
 Simply run:
