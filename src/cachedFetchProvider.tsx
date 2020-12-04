@@ -49,7 +49,7 @@ const defaultOptions: ICachedFetchOptions = {
 };
 
 export const CachedFetchProvider: FunctionComponent<ICachedFetchProviderProps> = ({
-  globalOptions = defaultOptions,
+  globalOptions,
   children,
 }) => {
   const [cache, setCache] = useState<ICache>({});
@@ -59,10 +59,11 @@ export const CachedFetchProvider: FunctionComponent<ICachedFetchProviderProps> =
   }, []);
 
   const memoizedGlobalOptions = useMemo<ICachedFetchOptions>(() => {
-    return {
-      ...defaultOptions,
-      ...globalOptions,
-    };
+    if (!globalOptions) {
+      return defaultOptions;
+    }
+
+    return { ...defaultOptions, ...globalOptions };
   }, [globalOptions]);
 
   return (

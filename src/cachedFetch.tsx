@@ -59,9 +59,17 @@ export const useCachedFetch = (
 ): IUseCachedFetchReturn => {
   const { cache, updateCache, globalOptions } = useContext(CachedFetchContext);
 
+  const memoizedOptions = useMemo<ICachedFetchProviderOptionalOptions>(() => {
+    if (!options) {
+      return {};
+    }
+
+    return options;
+  }, [options]);
+
   const unifiedOptions = useMemo<ICachedFetchOptions>(() => {
-    return { ...globalOptions, ...options };
-  }, [globalOptions, options]);
+    return { ...globalOptions, ...memoizedOptions };
+  }, [globalOptions, memoizedOptions]);
 
   const [headers] = useState<Headers>(unifiedOptions.headers);
   const [shouldRefresh, setShouldRefresh] = useState(false);
@@ -74,11 +82,7 @@ export const useCachedFetch = (
     hasError: false,
   });
 
-  const fetchCallback = useCallback(
-    (_route: string, _headers: Headers) =>
-      unifiedOptions.fetcher(_route, _headers),
-    [unifiedOptions],
-  );
+  const fetchCallback = useCallback(unifiedOptions.fetcher, []);
 
   useEffect(() => {
     if (
