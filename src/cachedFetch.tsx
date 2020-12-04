@@ -4,12 +4,9 @@ import {
   useContext,
   useReducer,
   useState,
+  useMemo,
 } from 'react';
-import {
-  CachedFetchContext,
-  ICachedFetchDefaultOptions,
-  ICachedFetchOptions,
-} from './cachedFetchProvider';
+import { CachedFetchContext, IHeaderOptions } from './cachedFetchProvider';
 
 interface ICachedFetchReducerState {
   isLoading: boolean;
@@ -20,11 +17,25 @@ interface ICachedFetchReducerAction {
   type: string;
 }
 
-interface IUseCachedFetchReturn {
-  data: any;
+interface IUseCachedFetchReturn<T> {
+  data: T;
   isLoading: boolean;
   hasError: boolean;
   refresh(): void;
+}
+
+interface IUseCachedFetchOptionalOptions<T> {
+  headers?: IHeaderOptions;
+  fetcher?: (route: string, headers: IHeaderOptions) => Promise<T>;
+  initialValue?: T;
+  dependencies?: boolean[];
+}
+
+interface IUseCachedFetchOptions<T> {
+  headers: IHeaderOptions;
+  fetcher: (route: string, headers: IHeaderOptions) => Promise<T>;
+  initialValue: T;
+  dependencies: boolean[];
 }
 
 const cachedFetchReducer = (
@@ -52,26 +63,34 @@ const cachedFetchReducer = (
   }
 };
 
-export const useCachedFetch = (
+export function useCachedFetch<T = any>(
   route: string,
-  options?: ICachedFetchOptions,
-): IUseCachedFetchReturn => {
-  const { cache, updateCache, globalOptions }: any = useContext(
-    CachedFetchContext,
-  );
-  const unifiedOptions: ICachedFetchDefaultOptions = {
-    ...globalOptions,
-    ...options,
-  };
-  const [headers] = useState<Headers>(unifiedOptions.headers);
-  const [state, dispatch] = useReducer(cachedFetchReducer, {
-    isLoading: false,
-    hasError: false,
-  });
+  options?: IUseCachedFetchOptionalOptions<T>,
+): IUseCachedFetchReturn<T> {
+  const { cache, updateCache, globalOptions } = useContext(CachedFetchContext);
+
+  const memoizedOptions = useMemo<IUseCachedFetchOptionalOptions<T>>(() => {
+    if (!options) {
+      return {};
+    }
+
+    return options;
+  }, [options]);
+
+  const unifiedOptions = useMemo<IUseCachedFetchOptions<T>>(() => {
+    return { ...globalOptions, ...memoizedOptions };
+  }, [globalOptions, memoizedOptions]);
+
+  const [headers] = useState<IHeaderOptions>(unifiedOptions.headers);
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [isWaitingForDependencies, setIsWaitingForDependencies] = useState(
     true,
   );
+
+  const [state, dispatch] = useReducer(cachedFetchReducer, {
+    isLoading: false,
+    hasError: false,
+  });
 
   const fetchCallback = useCallback(unifiedOptions.fetcher, []);
 
@@ -127,13 +146,13 @@ export const useCachedFetch = (
     isWaitingForDependencies,
   ]);
 
-  const refresh = () => {
+  const refresh = useCallback(() => {
     setShouldRefresh((current: Boolean) => !current);
-  };
+  }, []);
 
   return {
     data: cache[route] ?? unifiedOptions.initialValue,
     ...state,
     refresh,
   };
-};
+}

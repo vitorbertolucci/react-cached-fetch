@@ -1,59 +1,82 @@
-import React, {
-  useCallback,
-  useState,
-  createContext,
-  FunctionComponent,
-} from 'react';
+import React, { useCallback, useState, useMemo, createContext } from 'react';
 
-export interface ICachedFetchOptions {
-  headers?: Headers;
-  fetcher?: (route: string, headers: Headers) => any;
-  initialValue?: any;
-  dependencies?: boolean[];
+export interface IHeaderOptions {
+  [key: string]: string;
 }
 
-export interface ICachedFetchDefaultOptions {
-  headers: Headers;
-  fetcher: (route: string, headers: Headers) => any;
+interface ICachedFetchGlobalOptions {
+  headers: IHeaderOptions;
+  fetcher: (route: string, headers: IHeaderOptions) => Promise<any>;
   initialValue: any;
   dependencies: boolean[];
 }
 
-interface ICachedFetchProviderProps {
-  globalOptions?: ICachedFetchOptions;
+interface ICachedFetchProviderGlobalOptions {
+  headers?: IHeaderOptions;
+  fetcher?: (route: string, headers: IHeaderOptions) => Promise<any>;
+  initialValue?: any;
+  dependencies?: boolean[];
 }
 
-export const CachedFetchContext = createContext({});
+interface ICachedFetchProviderProps {
+  globalOptions?: ICachedFetchProviderGlobalOptions;
+}
 
-const defaultOptions = {
-  fetcher: async (route: string, headers: Headers): Promise<any> => {
+interface ICache {
+  [key: string]: any;
+}
+interface ICachedFetchContextData {
+  globalOptions: ICachedFetchGlobalOptions;
+  cache: ICache;
+  updateCache(key: string, data: any): void;
+}
+
+export const CachedFetchContext = createContext<ICachedFetchContextData>(
+  {} as ICachedFetchContextData,
+);
+
+const defaultOptions: ICachedFetchGlobalOptions = {
+  fetcher: async (route: string, headers: IHeaderOptions): Promise<any> => {
     const response = await fetch(route, { headers });
     const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.message || response.statusText || 'Request failed.',
+      );
+    }
+
     return result;
   },
-  headers: {
-    method: 'GET',
-  },
+  headers: {},
   initialValue: undefined,
   dependencies: [],
 };
 
-export const CachedFetchProvider: FunctionComponent<ICachedFetchProviderProps> = ({
-  globalOptions = defaultOptions,
+export const CachedFetchProvider: React.FC<ICachedFetchProviderProps> = ({
+  globalOptions,
   children,
 }) => {
-  const [cache, setCache] = useState<any>({});
+  const [cache, setCache] = useState<ICache>({});
 
   const updateCache = useCallback((key, data) => {
-    setCache((current: any) => ({ ...current, [key]: data }));
+    setCache((current: ICache) => ({ ...current, [key]: data }));
   }, []);
+
+  const memoizedGlobalOptions = useMemo<ICachedFetchGlobalOptions>(() => {
+    if (!globalOptions) {
+      return defaultOptions;
+    }
+
+    return { ...defaultOptions, ...globalOptions };
+  }, [globalOptions]);
 
   return (
     <CachedFetchContext.Provider
       value={{
         cache,
         updateCache,
-        globalOptions: { ...defaultOptions, ...globalOptions },
+        globalOptions: memoizedGlobalOptions,
       }}
     >
       {children}
