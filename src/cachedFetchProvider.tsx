@@ -41,6 +41,13 @@ const defaultOptions: ICachedFetchOptions = {
   fetcher: async (route: string, headers: Headers): Promise<any> => {
     const response = await fetch(route, { headers });
     const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.message || response.statusText || 'Request failed.',
+      );
+    }
+
     return result;
   },
   headers: new Headers(),
