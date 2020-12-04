@@ -6,7 +6,7 @@ import {
   useState,
   useMemo,
 } from 'react';
-import { CachedFetchContext } from './cachedFetchProvider';
+import { CachedFetchContext, IHeaderOptions } from './cachedFetchProvider';
 
 interface ICachedFetchReducerState {
   isLoading: boolean;
@@ -25,15 +25,15 @@ interface IUseCachedFetchReturn<T> {
 }
 
 interface IUseCachedFetchOptionalOptions<T> {
-  headers?: Headers;
-  fetcher?: (route: string, headers: Headers) => Promise<T>;
+  headers?: IHeaderOptions;
+  fetcher?: (route: string, headers: IHeaderOptions) => Promise<T>;
   initialValue?: T;
   dependencies?: boolean[];
 }
 
 interface IUseCachedFetchOptions<T> {
-  headers: Headers;
-  fetcher: (route: string, headers: Headers) => Promise<T>;
+  headers: IHeaderOptions;
+  fetcher: (route: string, headers: IHeaderOptions) => Promise<T>;
   initialValue: T;
   dependencies: boolean[];
 }
@@ -81,7 +81,7 @@ export function useCachedFetch<T = any>(
     return { ...globalOptions, ...memoizedOptions };
   }, [globalOptions, memoizedOptions]);
 
-  const [headers] = useState<Headers>(unifiedOptions.headers);
+  const [headers] = useState<IHeaderOptions>(unifiedOptions.headers);
   const [shouldRefresh, setShouldRefresh] = useState(false);
   const [isWaitingForDependencies, setIsWaitingForDependencies] = useState(
     true,

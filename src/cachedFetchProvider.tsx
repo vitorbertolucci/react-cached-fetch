@@ -1,15 +1,19 @@
 import React, { useCallback, useState, useMemo, createContext } from 'react';
 
+export interface IHeaderOptions {
+  [key: string]: string;
+}
+
 interface ICachedFetchGlobalOptions {
-  headers: Headers;
-  fetcher: (route: string, headers: Headers) => Promise<any>;
+  headers: IHeaderOptions;
+  fetcher: (route: string, headers: IHeaderOptions) => Promise<any>;
   initialValue: any;
   dependencies: boolean[];
 }
 
 interface ICachedFetchProviderGlobalOptions {
-  headers?: Headers;
-  fetcher?: (route: string, headers: Headers) => Promise<any>;
+  headers?: IHeaderOptions;
+  fetcher?: (route: string, headers: IHeaderOptions) => Promise<any>;
   initialValue?: any;
   dependencies?: boolean[];
 }
@@ -32,7 +36,7 @@ export const CachedFetchContext = createContext<ICachedFetchContextData>(
 );
 
 const defaultOptions: ICachedFetchGlobalOptions = {
-  fetcher: async (route: string, headers: Headers): Promise<any> => {
+  fetcher: async (route: string, headers: IHeaderOptions): Promise<any> => {
     const response = await fetch(route, { headers });
     const result = await response.json();
 
@@ -44,7 +48,7 @@ const defaultOptions: ICachedFetchGlobalOptions = {
 
     return result;
   },
-  headers: new Headers(),
+  headers: {},
   initialValue: undefined,
   dependencies: [],
 };
