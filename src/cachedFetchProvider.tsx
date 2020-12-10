@@ -1,8 +1,16 @@
-import React, { useCallback, useState, useMemo, createContext } from 'react';
+import React, {
+  useCallback,
+  useState,
+  useMemo,
+  createContext,
+  useEffect,
+} from 'react';
 
 export interface IHeaderOptions {
   [key: string]: string;
 }
+
+type IPersistenceType = 'none' | 'session' | 'local';
 
 interface ICachedFetchGlobalOptions {
   headers: IHeaderOptions;
@@ -20,6 +28,8 @@ interface ICachedFetchProviderGlobalOptions {
 
 interface ICachedFetchProviderProps {
   globalOptions?: ICachedFetchProviderGlobalOptions;
+  persistence?: IPersistenceType;
+  persistencePrefix?: string;
 }
 
 interface ICache {
@@ -55,9 +65,32 @@ const defaultOptions: ICachedFetchGlobalOptions = {
 
 export const CachedFetchProvider: React.FC<ICachedFetchProviderProps> = ({
   globalOptions,
+  persistence = 'none',
+  persistencePrefix,
   children,
 }) => {
-  const [cache, setCache] = useState<ICache>({});
+  const [cache, setCache] = useState<ICache>(() => {
+    if (persistence === 'none') {
+      return {};
+    }
+
+    if (!persistencePrefix) {
+      throw new Error(
+        'persistencePrefix must be provided when persistence is set to session or local',
+      );
+    }
+
+    const storage = persistence === 'session' ? sessionStorage : localStorage;
+
+    const persistedCache = storage.getItem(
+      `${persistencePrefix}-react-cached-fetch`,
+    );
+    if (!persistedCache) {
+      return {};
+    }
+
+    return JSON.parse(persistedCache);
+  });
 
   const updateCache = useCallback((key, data) => {
     setCache((current: ICache) => ({ ...current, [key]: data }));
@@ -70,6 +103,19 @@ export const CachedFetchProvider: React.FC<ICachedFetchProviderProps> = ({
 
     return { ...defaultOptions, ...globalOptions };
   }, [globalOptions]);
+
+  useEffect(() => {
+    if (persistence === 'none' || !persistencePrefix) {
+      return;
+    }
+
+    const storage = persistence === 'session' ? sessionStorage : localStorage;
+
+    storage.setItem(
+      `${persistencePrefix}-react-cached-fetch`,
+      JSON.stringify(cache),
+    );
+  }, [persistence, persistencePrefix, cache]);
 
   return (
     <CachedFetchContext.Provider
