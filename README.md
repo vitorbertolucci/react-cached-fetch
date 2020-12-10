@@ -1,7 +1,7 @@
 <!-- omit in toc -->
 # react-cached-fetch
 
-A simple react hook for data fetching with cache. It serves the cached version while waiting for the data to be fetched and then updates the cache with the fetched result. It is great for grids, lists or any other page thats loads data.
+A simple react hook for data fetching with cache. It serves the cached version while waiting for the data to be fetched and then updates the cache with the fetched result. It is great for grids, lists or any other page that loads data.
 <br/><br/>
 
 <!-- omit in toc -->
@@ -28,6 +28,7 @@ This library if fully written in TypeScript and supports generic types. You can 
 - [Installation](#installation)
 - [Usage](#usage)
 - [API](#api)
+  - [CachedFetchProvider](#cachedfetchprovider)
   - [useCachedFetch](#usecachedfetch)
   - [Options](#options)
   - [Global Options](#global-options)
@@ -99,34 +100,52 @@ const UserList = () => {
 
 export default UserList;
 ```
-<br/><br/>
+<br/>
 
 # API
+
+## CachedFetchProvider
+
+The **CachedFetchProvider** must be used to wrap all components that will use **useCachedFetch** hook in order for them to access the cached data. It is tipically used to wrap the entire App component, but you could use it at any component tree level.
+
+<br/>
+
+**Properties**
+
+| Property           | type                          | required                                      | description                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ------------------ | ----------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| globalOptions?     | object                        | no                                            | Global options that will be passed with every call of useCachedFetch, [explained below](#global-options).                                                                                                                                                                                                                                                                                                   |
+| persistence?       | 'none', 'session', or 'local' | no                                            | The persistence strategy you'd like to use to store the cached data. 'session' means browser's session storage, 'local' means browser's local storage and 'none' means that the data will only be stored in memory. Defaults to 'none'.                                                                                                                                                                     |
+| persistencePrefix? | string                        | yes, if persistence is different than 'none'. | The prefix to be used in the session/local storage's key. Example: if you set persistencePrefix to '@MyApp', the cache key will be '@MyApp-react-cached-fetch'. An error will be thrown if you set persistence to 'local' or 'session' and fail to provide a persistencePrefix. It is made like this to avoid conflicts when using react-cached-fetch in multiple apps on the same development environment. |
+
+<br /><br />
 
 ## useCachedFetch
 
 The **useCachedFetch** hook can be used to serve cached data while it fetches new data from a specified endpoint. It will perform the fetching automatically once when the component who's calling it is rendered, and it is also possible to trigger other fetches programmatically by calling the **refresh** function returned from it. Whenever the fetcher function gets triggered, it saves the request result in a cache whose key is the provided endpoint, so this new data can be returned by the hook while it waits for an update whenever the component gets remounted.
-<br/><br/>
+<br/>
 
 **Arguments**
 
 | Argument | type   | required | description                                                         |
 | -------- | ------ | -------- | ------------------------------------------------------------------- |
-| route    | string | yes      | The enpoint to which the fetcher function will send the GET request |
-| options? | object | no       | Aditional options, explained below
-<br/><br/>                      |
+| route    | string | yes      | The enpoint to which the fetcher function will send the GET request. |
+| options? | object | no       | Aditional options, [explained below](#options).                     |
+
+<br/>
 
 **Returned results**
 
 The return value of **useCachedFetch** is an object containing the following properties:
 
-| Property  | type     | default   | description                                       |
-| --------- | -------- | --------- | --------------------------------------------------------------------------------------- |
-| data      | any      | undefined | The remote data returned by the fetcher function                                        |
-| hasError  | boolean  | false     | A boolean indicating if there was an error while fetching the data                      |
-| isLoading | boolean  | false     | A boolean describing if the fetcher function is waiting for the request to be completed |
-| refresh   | function |           | A function to manually trigger the fetcher function and update the cache                    |
-<br/><br/>
+| Property  | type     | default   | description                                                                              |
+| --------- | -------- | --------- | ---------------------------------------------------------------------------------------- |
+| data      | any      | undefined | The remote data returned by the fetcher function.                                        |
+| hasError  | boolean  | false     | A boolean indicating if there was an error while fetching the data.                      |
+| isLoading | boolean  | false     | A boolean describing if the fetcher function is waiting for the request to be completed. |
+| refresh   | function |           | A function to manually trigger the fetcher function and update the cache.                |
+
+<br /><br />
 
 ## Options
 
@@ -158,14 +177,17 @@ async (route: string, headers: IHeaderOptions): Promise<any> => {
 ```javascript
 const UserInformationDashboard = () => {
   const { data: user } = useCachedFetch("users", {
-    initialValue: null
+    initialValue: {
+      id: ''
+    }
   });
+
   const { data: userDetails } = useCachedFetch(`userDetails/${user.id}`, {
     initialValue: {
       name: "",
       posts: 0
     },
-    dependencies: [user !== null]
+    dependencies: [!!user.id]
   });
 
   return <>Your Code</>;
