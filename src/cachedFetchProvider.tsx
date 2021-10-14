@@ -6,9 +6,7 @@ import React, {
   useEffect,
 } from 'react';
 
-export interface IHeaderOptions {
-  [key: string]: string;
-}
+export type IHeaderOptions = Record<string, string>;
 
 type IPersistenceType = 'none' | 'session' | 'local';
 
